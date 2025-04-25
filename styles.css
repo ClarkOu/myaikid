@@ -171,3 +171,8 @@ body {
 .danny-avatar {
     background-color: #f5a070;
 }
+
+.nancy-avatar i, .danny-avatar i {
+    font-size: 24px;
+    color: white;
+}
