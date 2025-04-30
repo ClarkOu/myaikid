@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // 根据名称跳转到不同页面
             if (name === '全球新聞 DEMO') {
-                window.location.href = 'https://clarkou.github.io/crazynews/';
+                window.open(URL, '_blank') = 'https://clarkou.github.io/crazynews/';
             } else if (name === 'ALVAZONE 小助理 DEMO') {
                 window.location.href = 'alvazone.html';
             }
