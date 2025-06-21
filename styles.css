@@ -127,6 +127,54 @@ body {
     font-size: 24px;
 }
 
+.onep-avatar {
+    background-color: #FF6B6B;
+    color: white;
+    font-size: 24px;
+}
+
+.twom-avatar {
+    background-color: #9B59B6;
+    color: white;
+    font-size: 24px;
+}
+
+.threem-avatar {
+    background-color: #2ECC71;
+    color: white;
+    font-size: 24px;
+}
+
+.fourm-avatar {
+    background-color: #E67E22;
+    color: white;
+    font-size: 24px;
+}
+
+.fivem-avatar {
+    background-color: #34495E;
+    color: white;
+    font-size: 24px;
+}
+
+.sixm-avatar {
+    background-color: #E74C3C;
+    color: white;
+    font-size: 24px;
+}
+
+.fourpc-avatar {
+    background-color: #8E44AD;
+    color: white;
+    font-size: 24px;
+}
+
+.fourpb-avatar {
+    background-color: #16A085;
+    color: white;
+    font-size: 24px;
+}
+
 .info {
     flex-grow: 1;
 }
