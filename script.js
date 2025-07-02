@@ -96,6 +96,85 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+    
+    // 圖片加載優化
+    const images = document.querySelectorAll('img[loading="lazy"]');
+    
+    // 圖片加載完成後移除加載狀態
+    images.forEach(img => {
+        img.addEventListener('load', function() {
+            this.classList.add('loaded');
+            this.parentElement.classList.add('loaded');
+        });
+        
+        // 如果圖片已經緩存，立即觸發loaded狀態
+        if (img.complete) {
+            img.classList.add('loaded');
+            img.parentElement.classList.add('loaded');
+        }
+    });
+    
+    // 預加載關鍵圖片 - 修正路徑並增加更多圖片
+    const preloadImages = [
+        'picture/1P.jpeg', 
+        'picture/2M.jpeg', 
+        'picture/3M.jpeg', 
+        'picture/4M.jpeg'
+    ];
+    preloadImages.forEach(src => {
+        const link = document.createElement('link');
+        link.rel = 'preload';
+        link.as = 'image';
+        link.href = src;
+        document.head.appendChild(link);
+    });
+    
+    // 添加更智能的圖片預加載策略
+    const addImagePreloading = () => {
+        const images = document.querySelectorAll('img[loading="lazy"]');
+        
+        // 使用Intersection Observer API來優化圖片加載
+        if ('IntersectionObserver' in window) {
+            const imageObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const img = entry.target;
+                        // 預加載即將進入視窗的圖片
+                        if (!img.src && img.dataset.src) {
+                            img.src = img.dataset.src;
+                        }
+                        observer.unobserve(img);
+                    }
+                });
+            }, {
+                // 當圖片距離視窗還有100px時就開始加載
+                rootMargin: '100px 0px'
+            });
+            
+            images.forEach(img => {
+                imageObserver.observe(img);
+            });
+        }
+    };
+    
+    // 調用圖片預加載策略
+    addImagePreloading();
+    
+    // 添加網路狀態檢測來優化圖片品質
+    const optimizeForConnection = () => {
+        if ('connection' in navigator) {
+            const connection = navigator.connection;
+            
+            // 如果是慢速網路，可以考慮使用更小的圖片
+            if (connection.effectiveType === 'slow-2g' || connection.effectiveType === '2g') {
+                console.log('偵測到慢速網路，已優化圖片加載策略');
+                // 可以在這裡添加更多優化邏輯
+            }
+        }
+    };
+    
+    optimizeForConnection();
+
 });
 
 // 更新時間函數（Web版本不需要，但保留以備後用）

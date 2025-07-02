@@ -43,6 +43,8 @@
             font-size: 16px;
             color: #667eea;
             transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
         }
         
         .back-btn:hover {
@@ -291,9 +293,9 @@
     <div class="sandbox-container">
         <!-- 導航區域 -->
         <div class="page-nav">
-            <button class="back-btn" onclick="history.back()">
-                <i class="fas fa-arrow-left"></i> 返回
-            </button>
+            <a href="index.html" class="back-btn">
+                <i class="fas fa-arrow-left"></i> 返回首頁
+            </a>
             
             <!-- 用戶菜單 -->
             <div class="user-menu">
@@ -547,7 +549,22 @@
                 e.stopPropagation();
                 const card = this.closest('.scenario-card');
                 const title = card.querySelector('.card-title').textContent;
-                alert(`${title}即將開始，請準備好與AI數字員工協作！`);
+                
+                // 根據沙盤類型跳轉到對應的詳細頁面
+                if (title === '危機管理演練') {
+                    window.location.href = 'crisis-management-sandbox.html';
+                } else if (title === '商業戰略決策') {
+                    // 可以創建其他沙盤頁面
+                    alert(`${title}沙盤正在開發中，敬請期待！`);
+                } else if (title === '市場競爭模擬') {
+                    // 可以創建其他沙盤頁面
+                    alert(`${title}沙盤正在開發中，敬請期待！`);
+                } else if (title === '團隊協作訓練') {
+                    // 可以創建其他沙盤頁面
+                    alert(`${title}沙盤正在開發中，敬請期待！`);
+                } else {
+                    alert(`${title}即將開始，請準備好與AI數字員工協作！`);
+                }
             });
         });
     </script>

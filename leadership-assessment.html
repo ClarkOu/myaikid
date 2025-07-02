@@ -1,0 +1,1320 @@
+<!DOCTYPE html>
+<html lang="zh-tw">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>領導力測評 - METIS AI 數字員工平台</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .leadership-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .page-nav {
+            position: absolute;
+            top: 30px;
+            left: 30px;
+            right: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1100;
+        }
+        
+        .back-btn {
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 50px;
+            padding: 12px 20px;
+            cursor: pointer;
+            font-size: 16px;
+            color: #667eea;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .back-btn:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* 用戶菜單樣式 */
+        .user-menu {
+            position: relative;
+            z-index: 1200;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 3px solid transparent;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ff8e8e 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+            position: relative;
+            z-index: 1201;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+        }
+
+        .user-avatar:hover {
+            transform: scale(1.05);
+            border-color: rgba(255, 107, 107, 0.3);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.5);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ff4757;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: bold;
+            border: 2px solid white;
+        }
+
+        .user-dropdown {
+            position: absolute;
+            top: 55px;
+            right: 0;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 15px 0;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            min-width: 220px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            z-index: 1200;
+            border: 1px solid rgba(102, 126, 234, 0.1);
+        }
+
+        .user-dropdown.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .user-info {
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 10px;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .user-email {
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            text-decoration: none;
+            color: #333;
+            transition: background-color 0.2s ease;
+        }
+
+        .dropdown-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .dropdown-item i {
+            margin-right: 12px;
+            width: 16px;
+            color: #666;
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background-color: #eee;
+            margin: 10px 0;
+        }
+
+        .page-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            margin: 80px 0 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .page-title {
+            background: linear-gradient(135deg, #ffeaa7 0%, #fab1a0 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: transparent;
+            margin-bottom: 15px;
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+
+        .page-subtitle {
+            font-size: 1.3rem;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .page-description {
+            color: #888;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+            font-size: 1.1rem;
+        }
+
+        .assessment-layout {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .assessment-sidebar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            height: fit-content;
+        }
+
+        .sidebar-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .progress-overview {
+            margin-bottom: 30px;
+        }
+
+        .progress-item {
+            background: rgba(255, 165, 0, 0.1);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid #ffa500;
+        }
+
+        .progress-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .progress-bar {
+            background: #f0f0f0;
+            border-radius: 10px;
+            height: 8px;
+            overflow: hidden;
+            margin-bottom: 5px;
+        }
+
+        .progress-fill {
+            background: linear-gradient(135deg, #ffeaa7 0%, #fab1a0 100%);
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.6s ease;
+        }
+
+        .progress-text {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .dimension-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .dimension-item {
+            background: rgba(102, 126, 234, 0.05);
+            border-radius: 10px;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            border-left: 3px solid #667eea;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .dimension-item:hover {
+            background: rgba(102, 126, 234, 0.1);
+            transform: translateX(5px);
+        }
+
+        .dimension-item.active {
+            background: rgba(102, 126, 234, 0.15);
+            border-left-color: #fab1a0;
+        }
+
+        .assessment-main {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .assessment-section {
+            display: none;
+        }
+
+        .assessment-section.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .section-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: white;
+            background: linear-gradient(135deg, #ffeaa7 0%, #fab1a0 100%);
+        }
+
+        .question-card {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .question-card:hover {
+            border-color: rgba(102, 126, 234, 0.3);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .question-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .question-description {
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .option-card {
+            background: rgba(102, 126, 234, 0.05);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .option-card:hover {
+            border-color: rgba(102, 126, 234, 0.3);
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .option-card.selected {
+            border-color: #fab1a0;
+            background: rgba(250, 177, 160, 0.2);
+        }
+
+        .scenario-card {
+            background: linear-gradient(135deg, rgba(255, 234, 167, 0.2), rgba(250, 177, 160, 0.2));
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border-left: 5px solid #fab1a0;
+        }
+
+        .scenario-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .scenario-content {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #ffeaa7 0%, #fab1a0 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(250, 177, 160, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            padding: 10px 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .results-summary {
+            background: linear-gradient(135deg, rgba(255, 234, 167, 0.3), rgba(250, 177, 160, 0.3));
+            border-radius: 20px;
+            padding: 30px;
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .results-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .results-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 30px;
+            align-items: center;
+        }
+
+        .radar-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 15px;
+            padding: 20px;
+            min-height: 350px;
+        }
+
+        .radar-container canvas {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        @media (max-width: 768px) {
+            .results-content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .radar-container {
+                min-height: 300px;
+                padding: 15px;
+            }
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        .result-item {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: left;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .result-label {
+            color: #333;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .result-score {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #ffeaa7 0%, #fab1a0 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: transparent;
+        }
+
+        .overall-assessment {
+            grid-column: 1 / -1;
+            margin-top: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: left;
+        }
+
+        .assessment-title {
+            color: #333;
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .assessment-content {
+            color: #555;
+            line-height: 1.6;
+            font-size: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="leadership-container">
+        <!-- 導航區域 -->
+        <div class="page-nav">
+            <a href="talent-assessment.html" class="back-btn">
+                <i class="fas fa-arrow-left"></i>
+                返回測評中心
+            </a>
+            
+            <!-- 用戶菜單 -->
+            <div class="user-menu">
+                <div class="user-avatar" id="userAvatar">
+                    CW
+                    <span class="notification-badge">3</span>
+                </div>
+                <div class="user-dropdown" id="userDropdown">
+                    <div class="user-info">
+                        <div class="user-name">Cily Wu</div>
+                        <div class="user-email">cily@metis.ai</div>
+                    </div>
+                    <a href="#" class="dropdown-item">
+                        <i class="fas fa-user"></i>
+                        個人資料
+                    </a>
+                    <a href="#" class="dropdown-item">
+                        <i class="fas fa-cog"></i>
+                        系統設置
+                    </a>
+                    <a href="#" class="dropdown-item">
+                        <i class="fas fa-bell"></i>
+                        通知設定
+                        <span style="margin-left: auto; background: #ff4757; color: white; border-radius: 10px; padding: 2px 8px; font-size: 12px;">3</span>
+                    </a>
+                    <a href="#" class="dropdown-item">
+                        <i class="fas fa-chart-bar"></i>
+                        使用統計
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <a href="#" class="dropdown-item">
+                        <i class="fas fa-question-circle"></i>
+                        幫助中心
+                    </a>
+                    <a href="#" class="dropdown-item">
+                        <i class="fas fa-life-ring"></i>
+                        意見回饋
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <a href="#" class="dropdown-item" style="color: #e74c3c;">
+                        <i class="fas fa-sign-out-alt"></i>
+                        登出
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 頁面標題 -->
+        <div class="page-header">
+            <h1 class="page-title">
+                <i class="fas fa-users-cog" style="margin-right: 15px; color: #fab1a0;"></i>
+                領導力測評
+            </h1>
+            <p class="page-subtitle">全面評估您的領導潛能與管理風格</p>
+            <p class="page-description">
+                通過科學的評估工具和情境模擬，深入分析您的領導能力、決策思維、團隊管理和變革領導等關鍵維度，
+                為您的職業發展和領導力提升提供專業指導。
+            </p>
+        </div>
+
+        <!-- 主要內容區域 -->
+        <div class="assessment-layout">
+            <!-- 左側邊欄 -->
+            <div class="assessment-sidebar">
+                <h3 class="sidebar-title">
+                    <i class="fas fa-chart-line"></i>
+                    測評進度
+                </h3>
+                
+                <div class="progress-overview">
+                    <div class="progress-item">
+                        <div class="progress-title">整體完成度</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 0%" id="overallProgress"></div>
+                        </div>
+                        <div class="progress-text">0% 完成</div>
+                    </div>
+                </div>
+
+                <h4 style="color: #333; margin-bottom: 15px;">評估維度</h4>
+                <ul class="dimension-list">
+                    <li class="dimension-item active" data-section="strategic">
+                        <i class="fas fa-chess"></i> 策略思維能力
+                    </li>
+                    <li class="dimension-item" data-section="team">
+                        <i class="fas fa-users"></i> 團隊領導能力
+                    </li>
+                    <li class="dimension-item" data-section="decision">
+                        <i class="fas fa-lightbulb"></i> 決策判斷能力
+                    </li>
+                    <li class="dimension-item" data-section="communication">
+                        <i class="fas fa-comments"></i> 溝通影響力
+                    </li>
+                    <li class="dimension-item" data-section="change">
+                        <i class="fas fa-sync-alt"></i> 變革領導力
+                    </li>
+                </ul>
+            </div>
+
+            <!-- 主要測評區域 -->
+            <div class="assessment-main">
+                <!-- 策略思維能力測評 -->
+                <div class="assessment-section active" id="strategic">
+                    <div class="section-title">
+                        <div class="section-icon">
+                            <i class="fas fa-chess"></i>
+                        </div>
+                        策略思維能力測評
+                    </div>
+
+                    <div class="scenario-card">
+                        <div class="scenario-title">情境案例：市場變革下的策略調整</div>
+                        <div class="scenario-content">
+                            您是一家科技公司的部門主管。由於市場競爭加劇和技術快速發展，
+                            公司需要在未來6個月內調整產品策略。您的部門是關鍵執行單位，
+                            但團隊成員對變革有不同意見，資源也相對有限。
+                        </div>
+                    </div>
+
+                    <div class="question-card">
+                        <div class="question-title">1. 面對這種情況，您的首要行動是什麼？</div>
+                        <div class="question-description">請選擇最符合您直觀反應的選項</div>
+                        <div class="options-grid">
+                            <div class="option-card" data-value="A">
+                                <strong>A. 深入市場調研</strong><br>
+                                先充分了解市場趨勢和競爭態勢，制定詳細的分析報告
+                            </div>
+                            <div class="option-card" data-value="B">
+                                <strong>B. 召集團隊討論</strong><br>
+                                組織團隊會議，收集各方意見，尋求共識
+                            </div>
+                            <div class="option-card" data-value="C">
+                                <strong>C. 制定多套方案</strong><br>
+                                快速設計2-3套備選策略，評估可行性和風險
+                            </div>
+                            <div class="option-card" data-value="D">
+                                <strong>D. 向上級匯報</strong><br>
+                                詳細向上級說明現狀，尋求更多資源和支持
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="question-card">
+                        <div class="question-title">2. 在資源有限的情況下，如何確保策略執行效果？</div>
+                        <div class="question-description">請選擇您認為最有效的方法</div>
+                        <div class="options-grid">
+                            <div class="option-card" data-value="A">
+                                <strong>A. 分階段實施</strong><br>
+                                將策略分解為小步驟，逐步推進，降低風險
+                            </div>
+                            <div class="option-card" data-value="B">
+                                <strong>B. 重點突破</strong><br>
+                                集中資源在最關鍵的項目上，確保重點成功
+                            </div>
+                            <div class="option-card" data-value="C">
+                                <strong>C. 外部合作</strong><br>
+                                尋找合作夥伴，通過聯盟方式共享資源
+                            </div>
+                            <div class="option-card" data-value="D">
+                                <strong>D. 創新方法</strong><br>
+                                運用新技術或管理方法，提高資源利用效率
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="btn-primary" onclick="nextSection()">下一維度</button>
+                        <button class="btn-secondary" onclick="saveProgress()">儲存進度</button>
+                    </div>
+                </div>
+
+                <!-- 團隊領導能力測評 -->
+                <div class="assessment-section" id="team">
+                    <div class="section-title">
+                        <div class="section-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        團隊領導能力測評
+                    </div>
+
+                    <div class="scenario-card">
+                        <div class="scenario-title">情境案例：團隊衝突處理</div>
+                        <div class="scenario-content">
+                            您的團隊中有兩位核心成員因為工作理念不同而產生嚴重分歧，
+                            影響了整個項目的進度。其他團隊成員也開始選邊站，團隊氛圍變得緊張。
+                            此時距離項目截止日期還有2週時間。
+                        </div>
+                    </div>
+
+                    <div class="question-card">
+                        <div class="question-title">1. 面對團隊內部衝突，您會如何處理？</div>
+                        <div class="options-grid">
+                            <div class="option-card" data-value="A">
+                                <strong>A. 立即介入調解</strong><br>
+                                單獨與雙方溝通，了解分歧根源，尋求解決方案
+                            </div>
+                            <div class="option-card" data-value="B">
+                                <strong>B. 組織團隊會議</strong><br>
+                                讓所有人公開討論，透明化處理衝突
+                            </div>
+                            <div class="option-card" data-value="C">
+                                <strong>C. 重新分工</strong><br>
+                                調整工作安排，減少衝突雙方的直接合作
+                            </div>
+                            <div class="option-card" data-value="D">
+                                <strong>D. 強調目標</strong><br>
+                                重申項目目標和時間壓力，要求暫時擱置分歧
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="btn-primary" onclick="nextSection()">下一維度</button>
+                        <button class="btn-secondary" onclick="prevSection()">上一維度</button>
+                    </div>
+                </div>
+
+                <!-- 決策判斷能力測評 -->
+                <div class="assessment-section" id="decision">
+                    <div class="section-title">
+                        <div class="section-icon">
+                            <i class="fas fa-lightbulb"></i>
+                        </div>
+                        決策判斷能力測評
+                    </div>
+
+                    <div class="scenario-card">
+                        <div class="scenario-title">情境案例：緊急決策</div>
+                        <div class="scenario-content">
+                            您負責的項目出現重大技術問題，可能導致產品延遲上市。
+                            現在有三個解決方案：快速修復但風險較高、延期但確保質量、
+                            或者降低功能要求按時交付。每個方案都有不同的商業影響。
+                        </div>
+                    </div>
+
+                    <div class="question-card">
+                        <div class="question-title">1. 在信息不充分的情況下，您如何做出關鍵決策？</div>
+                        <div class="options-grid">
+                            <div class="option-card" data-value="A">
+                                <strong>A. 收集更多信息</strong><br>
+                                延緩決策，盡可能收集完整信息後再決定
+                            </div>
+                            <div class="option-card" data-value="B">
+                                <strong>B. 依據經驗判斷</strong><br>
+                                基於過往經驗和直覺快速做出決策
+                            </div>
+                            <div class="option-card" data-value="C">
+                                <strong>C. 風險評估</strong><br>
+                                快速評估各選項的風險和收益，選擇最佳平衡點
+                            </div>
+                            <div class="option-card" data-value="D">
+                                <strong>D. 尋求建議</strong><br>
+                                諮詢專家或上級的意見，集體決策
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="btn-primary" onclick="nextSection()">下一維度</button>
+                        <button class="btn-secondary" onclick="prevSection()">上一維度</button>
+                    </div>
+                </div>
+
+                <!-- 溝通影響力測評 -->
+                <div class="assessment-section" id="communication">
+                    <div class="section-title">
+                        <div class="section-icon">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        溝通影響力測評
+                    </div>
+
+                    <div class="scenario-card">
+                        <div class="scenario-title">情境案例：跨部門協調</div>
+                        <div class="scenario-content">
+                            您需要其他部門配合完成一個重要項目，但該部門主管認為這會影響他們的工作優先級，
+                            表現出不太配合的態度。您需要說服對方提供支持。
+                        </div>
+                    </div>
+
+                    <div class="question-card">
+                        <div class="question-title">1. 面對不配合的跨部門同事，您會如何溝通？</div>
+                        <div class="options-grid">
+                            <div class="option-card" data-value="A">
+                                <strong>A. 明確利益</strong><br>
+                                清楚說明合作對雙方的好處和影響
+                            </div>
+                            <div class="option-card" data-value="B">
+                                <strong>B. 尋求上級支持</strong><br>
+                                請更高層級的領導來協調解決
+                            </div>
+                            <div class="option-card" data-value="C">
+                                <strong>C. 提供回報</strong><br>
+                                承諾在未來的合作中給予相應回報
+                            </div>
+                            <div class="option-card" data-value="D">
+                                <strong>D. 建立關係</strong><br>
+                                先建立個人關係，再談工作合作
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="btn-primary" onclick="nextSection()">下一維度</button>
+                        <button class="btn-secondary" onclick="prevSection()">上一維度</button>
+                    </div>
+                </div>
+
+                <!-- 變革領導力測評 -->
+                <div class="assessment-section" id="change">
+                    <div class="section-title">
+                        <div class="section-icon">
+                            <i class="fas fa-sync-alt"></i>
+                        </div>
+                        變革領導力測評
+                    </div>
+
+                    <div class="scenario-card">
+                        <div class="scenario-title">情境案例：組織變革推動</div>
+                        <div class="scenario-content">
+                            公司決定實施數字化轉型，需要改變現有的工作流程和系統。
+                            您的團隊成員對變革普遍感到擔憂，擔心工作安全和適應能力。
+                            您需要領導團隊順利完成這次變革。
+                        </div>
+                    </div>
+
+                    <div class="question-card">
+                        <div class="question-title">1. 面對團隊對變革的抗拒，您會如何應對？</div>
+                        <div class="options-grid">
+                            <div class="option-card" data-value="A">
+                                <strong>A. 說明變革必要性</strong><br>
+                                詳細解釋變革的原因和長遠好處
+                            </div>
+                            <div class="option-card" data-value="B">
+                                <strong>B. 提供培訓支持</strong><br>
+                                安排相關培訓，幫助團隊適應新系統
+                            </div>
+                            <div class="option-card" data-value="C">
+                                <strong>C. 分步驟實施</strong><br>
+                                將變革分解為小步驟，逐步推進
+                            </div>
+                            <div class="option-card" data-value="D">
+                                <strong>D. 建立激勵機制</strong><br>
+                                設置獎勵制度，鼓勵積極參與變革
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="btn-primary" onclick="showResults()">查看結果</button>
+                        <button class="btn-secondary" onclick="prevSection()">上一維度</button>
+                    </div>
+                </div>
+
+                <!-- 測評結果 -->
+                <div class="assessment-section" id="results">
+                    <div class="results-summary">
+                        <div class="results-title">
+                            <i class="fas fa-trophy" style="color: #fab1a0; margin-right: 15px;"></i>
+                            領導力測評結果
+                        </div>
+                        <p style="color: #666; margin-bottom: 30px;">
+                            恭喜您完成領導力測評！以下是您的綜合評估結果：
+                        </p>
+
+                        <div class="results-content">
+                            <!-- 雷達圖 -->
+                            <div class="radar-container">
+                                <canvas id="radarChart" width="350" height="350"></canvas>
+                            </div>
+
+                            <!-- 分數詳情 -->
+                            <div class="results-grid">
+                                <div class="result-item">
+                                    <div class="result-label">策略思維能力</div>
+                                    <div class="result-score" id="strategicScore">85</div>
+                                </div>
+                                <div class="result-item">
+                                    <div class="result-label">團隊領導能力</div>
+                                    <div class="result-score" id="teamScore">78</div>
+                                </div>
+                                <div class="result-item">
+                                    <div class="result-label">決策判斷能力</div>
+                                    <div class="result-score" id="decisionScore">82</div>
+                                </div>
+                                <div class="result-item">
+                                    <div class="result-label">溝通影響力</div>
+                                    <div class="result-score" id="communicationScore">76</div>
+                                </div>
+                                <div class="result-item">
+                                    <div class="result-label">變革領導力</div>
+                                    <div class="result-score" id="changeScore">80</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 總體評價 -->
+                        <div class="overall-assessment">
+                            <div class="assessment-title">
+                                <i class="fas fa-chart-line" style="color: #fab1a0;"></i>
+                                綜合評價
+                            </div>
+                            <div class="assessment-content">
+                                您展現出優秀的領導潛質，特別是在策略思維和決策判斷方面表現突出。建議在團隊管理和溝通技巧方面持續提升，以發揮更大的領導影響力。
+                                <br><br>
+                                <strong>發展建議：</strong>
+                                <ul style="margin-top: 10px; padding-left: 20px;">
+                                    <li>加強跨部門溝通協調能力，提升影響力範圍</li>
+                                    <li>深化團隊激勵和人才培養技巧</li>
+                                    <li>持續關注行業趨勢，保持策略敏銳度</li>
+                                    <li>建立更完善的變革管理流程和方法</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="action-buttons" style="justify-content: center; margin-top: 30px;">
+                            <button class="btn-primary" onclick="downloadReport()">下載詳細報告</button>
+                            <button class="btn-secondary" onclick="retakeAssessment()">重新測評</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentSection = 0;
+        const sections = ['strategic', 'team', 'decision', 'communication', 'change'];
+        let answers = {};
+
+        // 用戶菜單功能
+        const userAvatar = document.getElementById('userAvatar');
+        const userDropdown = document.getElementById('userDropdown');
+        
+        if (userAvatar && userDropdown) {
+            userAvatar.addEventListener('click', function(e) {
+                e.stopPropagation();
+                userDropdown.classList.toggle('show');
+            });
+            
+            document.addEventListener('click', function(e) {
+                if (!userAvatar.contains(e.target) && !userDropdown.contains(e.target)) {
+                    userDropdown.classList.remove('show');
+                }
+            });
+            
+            const dropdownItems = userDropdown.querySelectorAll('.dropdown-item');
+            dropdownItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const text = this.textContent.trim();
+                    
+                    if (text === '登出') {
+                        if (confirm('確定要登出嗎？')) {
+                            alert('登出成功！');
+                        }
+                    } else {
+                        alert(`${text}功能即將開放！`);
+                    }
+                    
+                    userDropdown.classList.remove('show');
+                });
+            });
+        }
+
+        // 選項選擇功能
+        document.addEventListener('DOMContentLoaded', function() {
+            const optionCards = document.querySelectorAll('.option-card');
+            
+            optionCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    // 移除同一問題中其他選項的選中狀態
+                    const questionCard = this.closest('.question-card');
+                    const siblingCards = questionCard.querySelectorAll('.option-card');
+                    siblingCards.forEach(sibling => sibling.classList.remove('selected'));
+                    
+                    // 選中當前選項
+                    this.classList.add('selected');
+                    
+                    // 保存答案
+                    const sectionId = this.closest('.assessment-section').id;
+                    const questionIndex = Array.from(questionCard.parentNode.children).indexOf(questionCard);
+                    const value = this.dataset.value;
+                    
+                    if (!answers[sectionId]) {
+                        answers[sectionId] = {};
+                    }
+                    answers[sectionId][questionIndex] = value;
+                    
+                    updateProgress();
+                });
+            });
+
+            // 側邊欄維度切換
+            const dimensionItems = document.querySelectorAll('.dimension-item');
+            dimensionItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const sectionId = this.dataset.section;
+                    showSection(sectionId);
+                    
+                    // 更新側邊欄活動狀態
+                    dimensionItems.forEach(dim => dim.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+        });
+
+        function showSection(sectionId) {
+            // 隱藏所有區塊
+            document.querySelectorAll('.assessment-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // 顯示目標區塊
+            document.getElementById(sectionId).classList.add('active');
+            
+            // 更新當前區塊索引
+            currentSection = sections.indexOf(sectionId);
+        }
+
+        function nextSection() {
+            if (currentSection < sections.length - 1) {
+                currentSection++;
+                const nextSectionId = sections[currentSection];
+                showSection(nextSectionId);
+                
+                // 更新側邊欄活動狀態
+                document.querySelectorAll('.dimension-item').forEach(item => {
+                    item.classList.remove('active');
+                    if (item.dataset.section === nextSectionId) {
+                        item.classList.add('active');
+                    }
+                });
+                
+                updateProgress();
+            }
+        }
+
+        function prevSection() {
+            if (currentSection > 0) {
+                currentSection--;
+                const prevSectionId = sections[currentSection];
+                showSection(prevSectionId);
+                
+                // 更新側邊欄活動狀態
+                document.querySelectorAll('.dimension-item').forEach(item => {
+                    item.classList.remove('active');
+                    if (item.dataset.section === prevSectionId) {
+                        item.classList.add('active');
+                    }
+                });
+                
+                updateProgress();
+            }
+        }
+
+        function updateProgress() {
+            const totalQuestions = sections.length;
+            const completedSections = Object.keys(answers).length;
+            const progressPercentage = (completedSections / totalQuestions) * 100;
+            
+            document.getElementById('overallProgress').style.width = progressPercentage + '%';
+            document.querySelector('.progress-text').textContent = Math.round(progressPercentage) + '% 完成';
+        }
+
+        function showResults() {
+            showSection('results');
+            
+            // 模擬計算結果
+            setTimeout(() => {
+                animateScores();
+                createRadarChart();
+            }, 500);
+        }
+
+        function animateScores() {
+            const scores = {
+                strategic: 85,
+                team: 78,
+                decision: 82,
+                communication: 76,
+                change: 80
+            };
+
+            Object.keys(scores).forEach(key => {
+                const element = document.getElementById(key + 'Score');
+                let current = 0;
+                const target = scores[key];
+                const increment = target / 50;
+                
+                const animation = setInterval(() => {
+                    current += increment;
+                    if (current >= target) {
+                        current = target;
+                        clearInterval(animation);
+                    }
+                    element.textContent = Math.round(current);
+                }, 30);
+            });
+        }
+
+        function createRadarChart() {
+            const ctx = document.getElementById('radarChart').getContext('2d');
+            
+            // 獲取五個維度的分數
+            const scores = [
+                85, // 策略思維能力
+                78, // 團隊領導能力  
+                82, // 決策判斷能力
+                76, // 溝通影響力
+                80  // 變革領導力
+            ];
+
+            const radarChart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: [
+                        '策略思維',
+                        '團隊領導', 
+                        '決策判斷',
+                        '溝通影響力',
+                        '變革領導'
+                    ],
+                    datasets: [{
+                        label: '領導力指數',
+                        data: scores,
+                        borderColor: 'rgba(102, 126, 234, 0.8)',
+                        backgroundColor: 'rgba(102, 126, 234, 0.2)',
+                        borderWidth: 3,
+                        pointBackgroundColor: 'rgba(102, 126, 234, 1)',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 6,
+                        pointHoverRadius: 8,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleColor: '#fff',
+                            bodyColor: '#fff',
+                            borderColor: 'rgba(102, 126, 234, 0.8)',
+                            borderWidth: 1,
+                            cornerRadius: 8,
+                            padding: 12,
+                            titleFont: {
+                                size: 14,
+                                weight: 'bold'
+                            },
+                            bodyFont: {
+                                size: 13
+                            },
+                            callbacks: {
+                                title: function(tooltipItems) {
+                                    return tooltipItems[0].label;
+                                },
+                                label: function(context) {
+                                    return '分數: ' + context.parsed.r + '/100';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        r: {
+                            min: 0,
+                            max: 100,
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 20,
+                                color: '#666',
+                                font: {
+                                    size: 12
+                                },
+                                callback: function(value) {
+                                    return value;
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(200, 200, 200, 0.3)',
+                                lineWidth: 1
+                            },
+                            angleLines: {
+                                color: 'rgba(200, 200, 200, 0.3)',
+                                lineWidth: 1
+                            },
+                            pointLabels: {
+                                color: '#333',
+                                font: {
+                                    size: window.innerWidth < 768 ? 11 : 13,
+                                    weight: '500'
+                                },
+                                padding: window.innerWidth < 768 ? 15 : 20
+                            }
+                        }
+                    },
+                    animation: {
+                        duration: 1500,
+                        easing: 'easeOutQuart'
+                    },
+                    interaction: {
+                        intersect: false,
+                        mode: 'point'
+                    }
+                }
+            });
+            
+            // 為響應式重新調整大小
+            function resizeChart() {
+                if (radarChart) {
+                    radarChart.resize();
+                }
+            }
+            
+            window.addEventListener('resize', resizeChart);
+        }
+
+        function saveProgress() {
+            alert('進度已保存！您可以稍後繼續完成測評。');
+        }
+
+        function downloadReport() {
+            alert('詳細報告正在生成中，將發送到您的郵箱！');
+        }
+
+        function retakeAssessment() {
+            if (confirm('確定要重新開始測評嗎？當前進度將會清除。')) {
+                answers = {};
+                currentSection = 0;
+                showSection('strategic');
+                
+                // 重置所有選項
+                document.querySelectorAll('.option-card').forEach(card => {
+                    card.classList.remove('selected');
+                });
+                
+                // 重置進度
+                updateProgress();
+                
+                // 重置側邊欄狀態
+                document.querySelectorAll('.dimension-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                document.querySelector('.dimension-item[data-section="strategic"]').classList.add('active');
+                
+                // 清除雷達圖
+                const radarCanvas = document.getElementById('radarChart');
+                if (radarCanvas && Chart.getChart(radarCanvas)) {
+                    Chart.getChart(radarCanvas).destroy();
+                }
+            }
+        }
+    </script>
+</body>
+</html>

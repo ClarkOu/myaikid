@@ -1,0 +1,1606 @@
+<!DOCTYPE html>
+<html lang="zh-tw">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>企業危機管理沙盤 - METIS AI 數字員工平台</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow-x: hidden;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        .simulation-container {
+            width: 100vw;
+            margin: 0;
+            padding: 20px;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+        }
+        
+        .simulation-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .simulation-nav {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .back-btn {
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid #667eea;
+            border-radius: 25px;
+            padding: 8px 16px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #667eea;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        
+        .back-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+        
+        .simulation-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #333;
+            margin: 0;
+        }
+        
+        .simulation-status {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .timer {
+            background: linear-gradient(135deg, #ff6b35, #f7931e);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 16px;
+        }
+        
+        .progress-indicator {
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 20px;
+            padding: 8px 16px;
+            color: #667eea;
+            font-weight: 600;
+        }
+        
+        .simulation-main {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 20px;
+            flex: 1;
+            min-height: 600px;
+            height: calc(100vh - 120px);
+            width: 100%;
+            max-width: 100%;
+            overflow: hidden;
+            align-items: stretch;
+        }
+        
+        /* 左側面板 - 場景信息 */
+        .scenario-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+            width: 100%;
+            min-height: calc(100vh - 140px);
+        }
+        
+        .scenario-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .crisis-level {
+            background: linear-gradient(135deg, #e84393, #fd79a8);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .scenario-description {
+            background: rgba(255, 107, 53, 0.1);
+            border-left: 4px solid #ff6b35;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            line-height: 1.6;
+            color: #333;
+            font-size: 0.85rem;
+        }
+
+        .scenario-description strong {
+            font-size: 0.9rem;
+            color: #333;
+        }
+
+        .scenario-description p {
+            font-size: 0.8rem;
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+
+        .scenario-description ul {
+            font-size: 0.8rem;
+            margin-left: 15px;
+        }
+
+        .scenario-description li {
+            font-size: 0.8rem;
+            margin-bottom: 4px;
+            line-height: 1.4;
+        }
+        
+        .metrics-panel {
+            margin-top: 20px;
+        }
+        
+        .metric-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .metric-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .metric-value {
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+        }
+        
+        .value-good { background: #00b894; color: white; }
+        .value-warning { background: #fdcb6e; color: white; }
+        .value-danger { background: #e84393; color: white; }
+        
+        /* 左侧企业组织架构侧边栏 */
+        .sidebar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            grid-column: 1;
+            overflow-y: auto;
+            height: calc(100vh - 120px);
+        }
+
+        .sidebar-header {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f3ff;
+        }
+
+        .sidebar-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sidebar-controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .sidebar-control-btn {
+            background: rgba(102, 126, 234, 0.08);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            color: #667eea;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .sidebar-control-btn:hover, .sidebar-control-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.25);
+        }
+
+        .company-structure-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .department-sidebar {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(247, 250, 255, 0.9));
+            border-radius: 12px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(102, 126, 234, 0.1);
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .department-sidebar:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+            border-color: rgba(102, 126, 234, 0.3);
+        }
+
+        .department-icon-sidebar {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: white;
+            flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .department-info-sidebar {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .department-name-sidebar {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 6px;
+            font-size: 0.9rem;
+        }
+
+        .department-status-sidebar {
+            font-size: 0.75rem;
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        /* 主要内容区域 */
+        .main-content {
+            grid-column: 2;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            overflow: hidden;
+        }
+
+        /* 突发事件面板 - 主要区域 */
+        .scenario-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+            width: 100%;
+            height: calc(100vh - 120px);
+            max-width: 100%;
+        }
+
+        /* 危機應對決策面板 - 已移除，使用.decision-section替代 */
+        
+        /* 視圖控制按鈕相關樣式 - 已移至侧边栏部分 */
+        
+        /* 沙盤視覺化區域 - 已移至企業架構部分 */
+        
+        /* 企業架構相關樣式 - 已整合至側邊欄 */
+        
+        /* 危機指標動畫 - 已保留在側邊欄部分 */
+        
+        /* 右側面板 - 決策中心 */
+        .decision-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+        }
+        
+        .decision-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .decision-options {
+            margin-bottom: 25px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .decision-option {
+            background: rgba(102, 126, 234, 0.05);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            height: auto;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        
+        .decision-option:hover {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.15);
+        }
+        
+        .decision-option.selected {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.15);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.25);
+        }
+        
+        .option-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+        
+        .option-description {
+            font-size: 0.85rem;
+            color: #666;
+            line-height: 1.4;
+            flex: 1;
+            margin-bottom: 10px;
+        }
+        
+        .option-impact {
+            margin-top: auto;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .impact-tag {
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        
+        /* Timeline 影響標籤樣式 */
+        .impact-positive { background: #00b894; color: white; }
+        .impact-negative { background: #e84393; color: white; }
+        .impact-neutral { background: #74b9ff; color: white; }
+        
+        .timeline-impact-small {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.7rem;
+        }
+        
+        .execute-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 15px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .execute-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .execute-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .ai-advisor {
+            margin-top: 25px;
+            background: rgba(255, 107, 53, 0.1);
+            border-radius: 12px;
+            padding: 15px;
+            border-left: 4px solid #ff6b35;
+        }
+        
+        .advisor-title {
+            font-weight: 600;
+            color: #ff6b35;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .advisor-message {
+            font-size: 0.9rem;
+            color: #333;
+            line-height: 1.5;
+        }
+        
+        /* 用戶菜單樣式 - 與主頁面保持一致 */
+        .user-menu {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            z-index: 1200;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 3px solid transparent;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ff8e8e 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+            position: relative;
+            z-index: 1201;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+        }
+
+        .user-avatar:hover {
+            transform: scale(1.05);
+            border-color: rgba(255, 107, 107, 0.3);
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ff4757;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: bold;
+            border: 2px solid white;
+        }
+
+        .user-dropdown {
+            position: absolute;
+            top: 55px;
+            right: 0;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            padding: 10px 0;
+            min-width: 200px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            z-index: 1199;
+        }
+
+        .user-dropdown.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .user-info {
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 5px;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .user-email {
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            text-decoration: none;
+            color: #333;
+            transition: background-color 0.2s ease;
+        }
+
+        .dropdown-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .dropdown-item i {
+            margin-right: 12px;
+            width: 16px;
+            color: #666;
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background-color: #eee;
+            margin: 5px 0;
+        }
+        
+        /* 新增視圖樣式 */
+        .view-content {
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+        }
+        
+        /* 歷史趨勢視圖 */
+        .history-chart {
+            padding: 20px;
+            min-height: 100%;
+        }
+        
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(to bottom, #667eea, #764ba2);
+        }
+        
+        .timeline-item {
+            position: relative;
+            margin-bottom: 20px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            padding: 15px;
+            border-left: 3px solid #667eea;
+        }
+        
+        .timeline-item.current {
+            border-left-color: #ff6b35;
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.2);
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -24px;
+            top: 20px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #667eea;
+            border: 3px solid white;
+        }
+        
+        .timeline-item.current::before {
+            background: #ff6b35;
+            animation: pulse 2s infinite;
+        }
+        
+        .timeline-time {
+            font-weight: 600;
+            color: #667eea;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+        
+        .timeline-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .timeline-desc {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+        }
+        
+        .timeline-impact {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        /* 预测分析视图 */
+        .prediction-analysis {
+            padding: 20px;
+            min-height: 100%;
+        }
+        
+        .prediction-scenarios {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .scenario-card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 12px;
+            padding: 15px;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .scenario-card.best-case {
+            border-color: #00b894;
+        }
+        
+        .scenario-card.moderate-case {
+            border-color: #fdcb6e;
+        }
+        
+        .scenario-card.worst-case {
+            border-color: #e84393;
+        }
+        
+        .scenario-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .scenario-header i {
+            margin-right: 8px;
+        }
+        
+        .best-case .scenario-header {
+            color: #00b894;
+        }
+        
+        .moderate-case .scenario-header {
+            color: #fdcb6e;
+        }
+        
+        .worst-case .scenario-header {
+            color: #e84393;
+        }
+        
+        .probability {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            padding: 4px 8px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+        }
+        
+        .scenario-content p {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .prediction-metrics {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+        
+        .prediction-metrics .metric {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            padding: 8px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .ai-recommendation {
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 12px;
+            padding: 15px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .ai-recommendation p {
+            color: #333;
+            line-height: 1.5;
+            margin: 0;
+        }
+        
+        /* 侧边栏特有样式 */
+        .sidebar-content {
+            flex: 1;
+            overflow-y: auto;
+            padding-top: 10px;
+        }
+
+        .sidebar-view-content {
+            width: 100%;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 时间线简化样式 */
+        .timeline-summary {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .timeline-item-small {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            padding: 10px;
+            border-left: 3px solid #667eea;
+        }
+
+        .timeline-item-small.current {
+            border-left-color: #00b894;
+            background: rgba(0, 184, 148, 0.1);
+        }
+
+        .timeline-time-small {
+            font-size: 0.7rem;
+            color: #666;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .timeline-title-small {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .timeline-impact-small {
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+
+        /* 预测分析简化样式 */
+        .prediction-summary {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .prediction-item-small {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            padding: 10px;
+        }
+
+        .prediction-item-small.best-case {
+            border-left: 3px solid #00b894;
+        }
+
+        .prediction-item-small.moderate-case {
+            border-left: 3px solid #fdcb6e;
+        }
+
+        .prediction-item-small.worst-case {
+            border-left: 3px solid #e84393;
+        }
+
+        .prediction-header-small {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .prediction-header-small span:first-child {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .probability-small {
+            font-size: 0.7rem;
+            color: #666;
+        }
+
+        .prediction-metric-small {
+            font-size: 0.7rem;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        /* 帶進度條的指標樣式 */
+        .metric-item-with-bar {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(102, 126, 234, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .metric-item-with-bar:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .metric-header-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .metric-icon-bar {
+            font-size: 20px;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .metric-name-bar {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #333;
+            flex: 1;
+        }
+
+        .metric-progress-bar {
+            background: #f0f0f0;
+            border-radius: 10px;
+            height: 10px;
+            margin-bottom: 8px;
+            overflow: hidden;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: all 0.6s ease;
+            position: relative;
+        }
+
+        .progress-bar-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.3),
+                transparent
+            );
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .progress-bar-fill.danger {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+        }
+
+        .progress-bar-fill.warning {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+        }
+
+        .progress-bar-fill.good {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+        }
+
+        .metric-value-bar {
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-align: right;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .metric-value-bar .metric-change {
+            font-size: 0.75rem;
+            padding: 2px 6px;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+
+        .metric-change.positive {
+            background: #27ae60;
+            color: white;
+        }
+
+        .metric-change.negative {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .metric-change.neutral {
+            background: #95a5a6;
+            color: white;
+        }
+
+        /* 決策部分樣式 */
+        .decision-section {
+            margin-top: 60px;
+            padding-top: 25px;
+            border-top: 2px solid rgba(102, 126, 234, 0.1);
+        }
+
+        /* 部門圖標顏色樣式 */
+        .dept-management { background: linear-gradient(135deg, #667eea, #764ba2); }
+        .dept-finance { background: linear-gradient(135deg, #00b894, #00cec9); }
+        .dept-marketing { background: linear-gradient(135deg, #ff6b35, #f7931e); }
+        .dept-hr { background: linear-gradient(135deg, #e84393, #fd79a8); }
+        .dept-tech { background: linear-gradient(135deg, #6c5ce7, #a29bfe); }
+        .dept-operations { background: linear-gradient(135deg, #fdcb6e, #e17055); }
+        
+        /* 部門狀態樣式 */
+        .status-normal { background: #00b894; color: white; }
+        .status-alert { background: #fdcb6e; color: white; }
+        .status-critical { background: #e84393; color: white; }
+        
+        /* 危機指標樣式 */
+        .crisis-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+            margin-left: auto;
+            flex-shrink: 0;
+        }
+        
+        .indicator-normal { background: #00b894; }
+        .indicator-warning { background: #fdcb6e; }
+        .indicator-critical { background: #e84393; }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="simulation-container">
+        <!-- 沙盤頂部導航 -->
+        <div class="simulation-header">
+            <div class="simulation-nav">
+                <a href="sandbox-training.html" class="back-btn">
+                    <i class="fas fa-arrow-left"></i> 返回沙盤選擇
+                </a>
+                <h1 class="simulation-title">
+                    <i class="fas fa-exclamation-triangle" style="color: #e84393; margin-right: 10px;"></i>
+                    企業危機管理沙盤
+                </h1>
+            </div>
+            
+            <div class="simulation-status">
+                <div class="timer">
+                    <i class="fas fa-clock" style="margin-right: 8px;"></i>
+                    <span id="timer">45:30</span>
+                </div>
+                <div class="progress-indicator">
+                    第 2/5 輪
+                </div>
+            </div>
+        </div>
+        
+        <!-- 用戶菜單 - 獨立定位在右上角 -->
+        <div class="user-menu">
+            <div class="user-avatar" id="userAvatar">
+                CW
+                <span class="notification-badge">3</span>
+            </div>
+            <div class="user-dropdown" id="userDropdown">
+                <div class="user-info">
+                    <div class="user-name">Cily Wu</div>
+                    <div class="user-email">cily@metis.ai</div>
+                </div>
+                <a href="#" class="dropdown-item">
+                    <i class="fas fa-user"></i>
+                    個人資料
+                </a>
+                <a href="#" class="dropdown-item">
+                    <i class="fas fa-cog"></i>
+                    系統設置
+                </a>
+                <a href="#" class="dropdown-item">
+                    <i class="fas fa-bell"></i>
+                    通知設定
+                    <span style="margin-left: auto; background: #ff4757; color: white; border-radius: 10px; padding: 2px 8px; font-size: 12px;">3</span>
+                </a>
+                <a href="#" class="dropdown-item">
+                    <i class="fas fa-chart-bar"></i>
+                    使用統計
+                </a>
+                <div class="dropdown-divider"></div>
+                <a href="#" class="dropdown-item">
+                    <i class="fas fa-question-circle"></i>
+                    幫助中心
+                </a>
+                <a href="#" class="dropdown-item">
+                    <i class="fas fa-life-ring"></i>
+                    意見回饋
+                </a>
+                <div class="dropdown-divider"></div>
+                <a href="#" class="dropdown-item" style="color: #e74c3c;">
+                    <i class="fas fa-sign-out-alt"></i>
+                    登出
+                </a>
+            </div>
+        </div>
+        
+        <!-- 沙盤主要內容區 -->
+        <div class="simulation-main">
+            <!-- 左侧企业组织架构侧边栏 -->
+            <div class="sidebar">
+                <div class="sidebar-header">
+                    <h3 class="sidebar-title">
+                        <i class="fas fa-building"></i>
+                        企業組織架構
+                    </h3>
+                    <div class="sidebar-controls">
+                        <button class="sidebar-control-btn active">實時狀態</button>
+                        <button class="sidebar-control-btn">歷史趨勢</button>
+                        <button class="sidebar-control-btn">預測分析</button>
+                        <button class="sidebar-control-btn">關鍵指標</button>
+                    </div>
+                </div>
+                
+                <div class="sidebar-content">
+                    <!-- 實時狀態視圖 -->
+                    <div class="sidebar-view-content" id="sidebar-realtime-view">
+                        <div class="company-structure-sidebar">
+                            <div class="department-sidebar">
+                                <div class="department-icon-sidebar dept-management">
+                                    <i class="fas fa-sitemap"></i>
+                                </div>
+                                <div class="department-info-sidebar">
+                                    <div class="department-name-sidebar">6M生態</div>
+                                    <div class="department-status-sidebar status-alert">高度關注</div>
+                                </div>
+                                <div class="crisis-indicator indicator-warning"></div>
+                            </div>
+                            
+                            <div class="department-sidebar">
+                                <div class="department-icon-sidebar dept-marketing">
+                                    <i class="fas fa-bullhorn"></i>
+                                </div>
+                                <div class="department-info-sidebar">
+                                    <div class="department-name-sidebar">市場公關部</div>
+                                    <div class="department-status-sidebar status-critical">緊急狀態</div>
+                                </div>
+                                <div class="crisis-indicator indicator-critical"></div>
+                            </div>
+                            
+                            <div class="department-sidebar">
+                                <div class="department-icon-sidebar dept-tech">
+                                    <i class="fas fa-server"></i>
+                                </div>
+                                <div class="department-info-sidebar">
+                                    <div class="department-name-sidebar">IS部</div>
+                                    <div class="department-status-sidebar status-alert">調查中</div>
+                                </div>
+                                <div class="crisis-indicator indicator-warning"></div>
+                            </div>
+                            
+                            <div class="department-sidebar">
+                                <div class="department-icon-sidebar dept-finance">
+                                    <i class="fas fa-shield-alt"></i>
+                                </div>
+                                <div class="department-info-sidebar">
+                                    <div class="department-name-sidebar">風險管理生態</div>
+                                    <div class="department-status-sidebar status-normal">穩定</div>
+                                </div>
+                                <div class="crisis-indicator indicator-normal"></div>
+                            </div>
+                            
+                            <div class="department-sidebar">
+                                <div class="department-icon-sidebar dept-hr">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <div class="department-info-sidebar">
+                                    <div class="department-name-sidebar">人力資源生態</div>
+                                    <div class="department-status-sidebar status-alert">安撫員工</div>
+                                </div>
+                                <div class="crisis-indicator indicator-warning"></div>
+                            </div>
+                            
+                            <div class="department-sidebar">
+                                <div class="department-icon-sidebar dept-operations">
+                                    <i class="fas fa-cube"></i>
+                                </div>
+                                <div class="department-info-sidebar">
+                                    <div class="department-name-sidebar">產品運營</div>
+                                    <div class="department-status-sidebar status-normal">正常運作</div>
+                                </div>
+                                <div class="crisis-indicator indicator-normal"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 歷史趨勢視圖 -->
+                    <div class="sidebar-view-content" id="sidebar-history-view" style="display: none;">
+                        <div class="timeline-summary">
+                            <div class="timeline-item-small">
+                                <div class="timeline-time-small">08:00</div>
+                                <div class="timeline-title-small">事件爆發</div>
+                                <div class="timeline-impact-small impact-negative">品牌聲譽 -15%</div>
+                            </div>
+                            <div class="timeline-item-small">
+                                <div class="timeline-time-small">10:30</div>
+                                <div class="timeline-title-small">社交媒體擴散</div>
+                                <div class="timeline-impact-small impact-negative">客戶滿意度 -20%</div>
+                            </div>
+                            <div class="timeline-item-small">
+                                <div class="timeline-time-small">12:00</div>
+                                <div class="timeline-title-small">股價下跌</div>
+                                <div class="timeline-impact-small impact-negative">股價 -8.2%</div>
+                            </div>
+                            <div class="timeline-item-small current">
+                                <div class="timeline-time-small">現在</div>
+                                <div class="timeline-title-small">沙盤演練</div>
+                                <div class="timeline-impact-small impact-positive">準備應對方案</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 預測分析視圖 -->
+                    <div class="sidebar-view-content" id="sidebar-prediction-view" style="display: none;">
+                        <div class="prediction-summary">
+                            <div class="prediction-item-small best-case">
+                                <div class="prediction-header-small">
+                                    <span>最佳情況</span>
+                                    <span class="probability-small">30%</span>
+                                </div>
+                                <div class="prediction-metric-small">品牌恢復: 85%</div>
+                            </div>
+                            <div class="prediction-item-small moderate-case">
+                                <div class="prediction-header-small">
+                                    <span>中等情況</span>
+                                    <span class="probability-small">50%</span>
+                                </div>
+                                <div class="prediction-metric-small">品牌恢復: 65%</div>
+                            </div>
+                            <div class="prediction-item-small worst-case">
+                                <div class="prediction-header-small">
+                                    <span>最壞情況</span>
+                                    <span class="probability-small">20%</span>
+                                </div>
+                                <div class="prediction-metric-small">品牌恢復: 40%</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 關鍵指標視圖 -->
+                    <div class="sidebar-view-content" id="sidebar-metrics-view" style="display: none;">
+                        <div class="metrics-sidebar">
+                            <div class="metric-item-with-bar">
+                                <div class="metric-header-bar">
+                                    <div class="metric-icon-bar">📊</div>
+                                    <div class="metric-name-bar">品牌聲譽</div>
+                                </div>
+                                <div class="metric-progress-bar">
+                                    <div class="progress-bar-fill danger" style="width: 72%;"></div>
+                                </div>
+                                <div class="metric-value-bar">
+                                    <span style="color: #333;">72%</span>
+                                    <span class="metric-change negative">↓ 15%</span>
+                                </div>
+                            </div>
+                            
+                            <div class="metric-item-with-bar">
+                                <div class="metric-header-bar">
+                                    <div class="metric-icon-bar">😊</div>
+                                    <div class="metric-name-bar">客戶滿意度</div>
+                                </div>
+                                <div class="metric-progress-bar">
+                                    <div class="progress-bar-fill warning" style="width: 65%;"></div>
+                                </div>
+                                <div class="metric-value-bar">
+                                    <span style="color: #333;">65%</span>
+                                    <span class="metric-change negative">↓ 20%</span>
+                                </div>
+                            </div>
+                            
+                            <div class="metric-item-with-bar">
+                                <div class="metric-header-bar">
+                                    <div class="metric-icon-bar">📈</div>
+                                    <div class="metric-name-bar">股價表現</div>
+                                </div>
+                                <div class="metric-progress-bar">
+                                    <div class="progress-bar-fill danger" style="width: 35%;"></div>
+                                </div>
+                                <div class="metric-value-bar">
+                                    <span style="color: #333;">91.8</span>
+                                    <span class="metric-change negative">↓ 8.2%</span>
+                                </div>
+                            </div>
+                            
+                            <div class="metric-item-with-bar">
+                                <div class="metric-header-bar">
+                                    <div class="metric-icon-bar">👥</div>
+                                    <div class="metric-name-bar">員工士氣</div>
+                                </div>
+                                <div class="metric-progress-bar">
+                                    <div class="progress-bar-fill warning" style="width: 68%;"></div>
+                                </div>
+                                <div class="metric-value-bar">
+                                    <span style="color: #333;">68%</span>
+                                    <span class="metric-change negative">↓ 12%</span>
+                                </div>
+                            </div>
+                            
+                            <div class="metric-item-with-bar">
+                                <div class="metric-header-bar">
+                                    <div class="metric-icon-bar">💰</div>
+                                    <div class="metric-name-bar">現金流</div>
+                                </div>
+                                <div class="metric-progress-bar">
+                                    <div class="progress-bar-fill good" style="width: 85%;"></div>
+                                </div>
+                                <div class="metric-value-bar">
+                                    <span style="color: #27ae60; font-weight: 700;">健康</span>
+                                    <span class="metric-change neutral">穩定</span>
+                                </div>
+                            </div>
+                            
+                            <div class="metric-item-with-bar">
+                                <div class="metric-header-bar">
+                                    <div class="metric-icon-bar">📺</div>
+                                    <div class="metric-name-bar">媒體關注</div>
+                                </div>
+                                <div class="metric-progress-bar">
+                                    <div class="progress-bar-fill danger" style="width: 95%;"></div>
+                                </div>
+                                <div class="metric-value-bar">
+                                    <span style="color: #e74c3c; font-weight: 700;">極高</span>
+                                    <span class="metric-change negative">↑ 300%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 主要内容区域 -->
+            <div class="main-content">
+                <!-- 突发事件与决策面板 - 合并 -->
+                <div class="scenario-panel">
+                    <div class="scenario-title">
+                        <i class="fas fa-newspaper" style="color: #e84393;"></i>
+                        突發事件
+                        <span class="crisis-level">高危</span>
+                    </div>
+                    
+                    <div class="scenario-description">
+                        <strong>媒體曝光：產品質量問題</strong><br><br>
+                        某知名媒體今晨報導指出您公司的主力產品存在質量缺陷，已有多位消費者投訴。該報導在社交媒體迅速傳播，公司股價開盤即下跌8%。
+                        <br><br>
+                        <strong>影響範圍：</strong>品牌形象、客戶信任、銷售業績、員工士氣
+                        <br><br>
+                        <strong>詳細描述：</strong>
+                        <p>上午8點，《商業周刊》發布了一篇題為"知名品牌產品質量隱患曝光"的深度調查報導。報導詳細披露了我們公司主力產品在生產過程中存在的質量控制問題，並引用了多位消費者的投訴案例。</p>
+                        
+                        <p>報導中提到，在過去一個月內，已有超過50位消費者通過不同渠道反映產品存在功能異常、外觀瑕疵等問題。更令人擔憂的是，報導還引用了一位行業專家的分析，指出這些問題可能與我們最近更換的供應商有關。</p>
+                        
+                        <p>截至目前，這篇報導已在社交媒體上被轉發超過10,000次，相關話題標籤#產品質量危機 迅速登上熱搜榜前三位。我們的客服熱線已接到大量詢問電話，客服人員正在緊急應對中。</p>
+                        
+                        <p><strong>媒體反應：</strong></p>
+                        <ul>
+                            <li>《財經日報》：跟進報導，質疑我們的質量管理體系</li>
+                            <li>《消費者權益保護》：發表評論文章，呼籲加強行業監管</li>
+                            <li>多家電視台：將此事件列入今日財經新聞重點報導</li>
+                        </ul>
+                        
+                        <p><strong>競爭對手動態：</strong></p>
+                        <ul>
+                            <li>競爭對手A公司：發布聲明強調自己的產品質量優勢</li>
+                            <li>競爭對手B公司：在社交媒體上暗示此事件反映了行業整體問題</li>
+                        </ul>
+                    </div>
+
+                    <!-- 危机应对决策 - 直接在突发事件下方 -->
+                    <div class="decision-section">
+                        <div class="decision-title">
+                            <i class="fas fa-chess-queen" style="color: #667eea;"></i>
+                            危機應對決策
+                        </div>
+                        
+                        <div class="decision-options">
+                            <div class="decision-option" onclick="selectOption(this)">
+                                <div class="option-title">立即召開緊急記者會</div>
+                                <div class="option-description">主動回應媒體質疑，由CEO親自說明情況並提出解決方案</div>
+                                <div class="option-impact">
+                                    <span class="impact-tag impact-positive">透明度+</span>
+                                    <span class="impact-tag impact-negative">風險高</span>
+                                </div>
+                            </div>
+                            
+                            <div class="decision-option" onclick="selectOption(this)">
+                                <div class="option-title">內部調查後再回應</div>
+                                <div class="option-description">先進行徹底的內部調查，確認問題根源後再對外說明</div>
+                                <div class="option-impact">
+                                    <span class="impact-tag impact-positive">準確性+</span>
+                                    <span class="impact-tag impact-negative">時間延遲</span>
+                                </div>
+                            </div>
+                            
+                            <div class="decision-option" onclick="selectOption(this)">
+                                <div class="option-title">啟動危機公關計畫</div>
+                                <div class="option-description">聯繫專業公關公司，制定全面的危機溝通策略</div>
+                                <div class="option-impact">
+                                    <span class="impact-tag impact-positive">專業性+</span>
+                                    <span class="impact-tag impact-neutral">成本中等</span>
+                                </div>
+                            </div>
+                            
+                            <div class="decision-option" onclick="selectOption(this)">
+                                <div class="option-title">產品召回與補償</div>
+                                <div class="option-description">主動召回相關產品並提供客戶補償方案</div>
+                                <div class="option-impact">
+                                    <span class="impact-tag impact-positive">責任感+</span>
+                                    <span class="impact-tag impact-negative">成本高</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button class="execute-btn" id="executeBtn" disabled onclick="executeDecision()">
+                            請選擇決策方案
+                        </button>
+                        
+                        <div class="ai-advisor">
+                            <div class="advisor-title">
+                                <i class="fas fa-robot"></i>
+                                AI 顧問建議
+                            </div>
+                            <div class="advisor-message">
+                                根據類似案例分析，建議採用「產品召回與補償」結合「啟動危機公關計畫」的組合策略。這樣既展現了企業的責任感，又能通過專業的公關策略最大化挽回品牌形象。
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 倒數計時器
+        let timeLeft = 45 * 60 + 30; // 45分30秒
+        const timerElement = document.getElementById('timer');
+        
+        function updateTimer() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            
+            if (timeLeft > 0) {
+                timeLeft--;
+            } else {
+                // 時間到
+                alert('本輪沙盤演練時間結束！');
+            }
+        }
+        
+        setInterval(updateTimer, 1000);
+        
+        // 決策選項選擇
+        let selectedOption = null;
+        
+        function selectOption(element) {
+            // 移除其他選項的選中狀態
+            document.querySelectorAll('.decision-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            // 選中當前選項
+            element.classList.add('selected');
+            selectedOption = element;
+            
+            // 啟用執行按鈕
+            const executeBtn = document.getElementById('executeBtn');
+            executeBtn.disabled = false;
+            executeBtn.textContent = '執行選定決策';
+        }
+        
+        function executeDecision() {
+            if (!selectedOption) return;
+            
+            const optionTitle = selectedOption.querySelector('.option-title').textContent;
+            
+            // 模擬決策執行
+            const executeBtn = document.getElementById('executeBtn');
+            executeBtn.textContent = '決策執行中...';
+            executeBtn.disabled = true;
+            
+            setTimeout(() => {
+                alert(`決策「${optionTitle}」已執行！\n\n結果將在下一輪沙盤中顯示。`);
+                
+                // 重置狀態
+                selectedOption.classList.remove('selected');
+                selectedOption = null;
+                executeBtn.textContent = '請選擇決策方案';
+                executeBtn.disabled = true;
+                
+                // 這裡可以添加跳轉到結果頁面或下一輪的邏輯
+            }, 2000);
+        }
+        
+        // 部门点击事件（已移至侧边栏）
+        // 旧的部门点击代码已删除
+        
+        // 旧的视图控制按钮代码已删除，现在使用侧边栏控制
+        
+        // 侧边栏视图控制按钮
+        document.querySelectorAll('.sidebar-control-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.sidebar-control-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                
+                const viewType = this.textContent.trim();
+                
+                // 隱藏所有側邊欄視圖
+                document.querySelectorAll('.sidebar-view-content').forEach(view => {
+                    view.style.display = 'none';
+                });
+                
+                // 根據選擇顯示對應視圖
+                switch(viewType) {
+                    case '實時狀態':
+                        document.getElementById('sidebar-realtime-view').style.display = 'block';
+                        break;
+                    case '歷史趨勢':
+                        document.getElementById('sidebar-history-view').style.display = 'block';
+                        break;
+                    case '預測分析':
+                        document.getElementById('sidebar-prediction-view').style.display = 'block';
+                        break;
+                    case '關鍵指標':
+                        document.getElementById('sidebar-metrics-view').style.display = 'block';
+                        break;
+                    default:
+                        document.getElementById('sidebar-realtime-view').style.display = 'block';
+                }
+                
+                console.log('側邊欄切換到視圖：', viewType);
+            });
+        });
+
+        // 侧边栏部门点击事件
+        document.querySelectorAll('.department-sidebar').forEach(dept => {
+            dept.addEventListener('click', function() {
+                const deptName = this.querySelector('.department-name-sidebar').textContent;
+                alert(`查看${deptName}詳細狀況：\n\n這裡會顯示該部門的詳細信息、當前狀態、建議措施等。`);
+            });
+        });
+
+        // 用戶菜單功能
+        document.addEventListener('DOMContentLoaded', function() {
+            const userAvatar = document.getElementById('userAvatar');
+            const userDropdown = document.getElementById('userDropdown');
+            
+            if (userAvatar && userDropdown) {
+                userAvatar.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    userDropdown.classList.toggle('show');
+                });
+                
+                document.addEventListener('click', function(e) {
+                    if (!userDropdown.contains(e.target)) {
+                        userDropdown.classList.remove('show');
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
