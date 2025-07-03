@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="zh-tw">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>成長四步框架 - METIS AI 數字員工平台</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: "Microsoft YaHei", Arial, sans-serif;
+            background-color: #f4f5f7;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            justify-content: flex-start;
+            padding-top: 120px;
+        }
+
+        .page-nav {
+            position: fixed;
+            top: 30px;
+            left: 30px;
+            right: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1100;
+        }
+        
+        .back-btn {
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 50px;
+            padding: 12px 20px;
+            cursor: pointer;
+            font-size: 16px;
+            color: #667eea;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .back-btn:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* 用戶菜單樣式 */
+        .user-menu {
+            position: relative;
+            z-index: 1200;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 3px solid transparent;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ff8e8e 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+            position: relative;
+            z-index: 1201;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+        }
+
+        .user-avatar:hover {
+            transform: scale(1.05);
+            border-color: rgba(255, 107, 107, 0.3);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.5);
+        }
+
+        .user-dropdown {
+            position: absolute;
+            top: 55px;
+            right: 0;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 15px 0;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            min-width: 220px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            z-index: 1200;
+            border: 1px solid rgba(102, 126, 234, 0.1);
+        }
+
+        .user-dropdown.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .user-info {
+            padding: 10px 20px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            margin-bottom: 10px;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: #333;
+            font-size: 16px;
+            margin-bottom: 3px;
+        }
+
+        .user-email {
+            font-size: 14px;
+            color: #888;
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: #555;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .dropdown-item:hover {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+        }
+
+        .dropdown-item i {
+            margin-right: 12px;
+            width: 16px;
+            font-size: 14px;
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: rgba(0, 0, 0, 0.1);
+            margin: 10px 0;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ff4757;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1800px;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+
+        .company-input {
+            flex-grow: 1;
+            padding: 10px 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            white-space: nowrap;
+        }
+
+        .generate-btn {
+            background-color: #28a745;
+            color: white;
+        }
+        .generate-btn:hover {
+            background-color: #218838;
+        }
+
+        .clear-btn {
+            background-color: #dc3545;
+            color: white;
+        }
+        .clear-btn:hover {
+            background-color: #c82333;
+        }
+        
+        .page-title {
+            text-align: center;
+            font-weight: bold;
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+
+        .page-title .red-text {
+            color: #ff0000;
+        }
+
+        .framework-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            table-layout: fixed;
+        }
+
+        .framework-table th, .framework-table td {
+            border: 1px solid #000;
+            padding: 5px;
+            text-align: center;
+            vertical-align: middle;
+            height: 35px;
+        }
+
+        .description-table {
+             width: 100%;
+             border-collapse: collapse;
+             margin-bottom: 15px;
+        }
+
+        .description-table td {
+            border: 1px solid #000;
+            padding: 8px;
+            font-size: 14px;
+        }
+
+        .description-label {
+            background-color: #ffd966;
+            font-weight: bold;
+            text-align: center;
+            width: 120px;
+        }
+
+        .description-text {
+            color: #999;
+            font-style: italic;
+        }
+
+        .stage-header {
+            font-weight: bold;
+            font-size: 16px;
+            color: white;
+        }
+
+        .stage-1 { background-color: #ffd966; color: #000; }
+        .stage-2 { background-color: #70ad47; }
+        .stage-3 { background-color: #ed7d31; }
+        .stage-4 { background-color: #4472c4; }
+
+        .sub-header {
+            font-weight: normal;
+            font-size: 12px;
+            background-color: #fff2cc;
+        }
+        .sub-header-2 { background-color: #e2f0d9; }
+        .sub-header-3 { background-color: #fbe5d6; }
+        .sub-header-4 { background-color: #ddebf7; }
+
+        .sub-header .red-text {
+            color: #ff0000;
+            font-weight: bold;
+        }
+        
+        .row-header-vertical {
+            width: 40px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .data-cell {
+            background-color: #fff;
+            height: 30px;
+            font-size: 12px;
+            word-wrap: break-word;
+            white-space: normal;
+        }
+        
+        .typing-animation::after {
+            content: '|';
+            animation: blink 1s infinite;
+            font-weight: bold;
+        }
+
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
+
+        .progress-section {
+            margin-bottom: 15px;
+            display: none;
+        }
+        .progress-bar {
+            width: 100%;
+            background-color: #e9ecef;
+            border-radius: 4px;
+            height: 10px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            width: 0%;
+            height: 100%;
+            background-color: #28a745;
+            transition: width 0.3s ease-in-out;
+        }
+        #progressText {
+            text-align: center;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+    </style>
+</head>
+<body>
+    <!-- 頂部導航 -->
+    <div class="page-nav">
+        <button class="back-btn" onclick="window.location.href='index.html'">
+            <i class="fas fa-arrow-left"></i>
+            返回首頁
+        </button>
+        
+        <!-- 用戶菜單 -->
+        <div class="user-menu">
+            <div class="user-avatar" id="userAvatar">
+                CW
+                <span class="notification-badge">3</span>
+            </div>
+            <div class="user-dropdown" id="userDropdown">
+                <div class="user-info">
+                    <div class="user-name">Cily Wu</div>
+                    <div class="user-email">cily@metis.ai</div>
+                </div>
+                <a href="#" class="dropdown-item">
+                    <i class="fas fa-user"></i>
+                    個人資料
+                </a>
+                <a href="#" class="dropdown-item">
+                    <i class="fas fa-cog"></i>
+                    系統設置
+                </a>
+                <a href="#" class="dropdown-item">
+                    <i class="fas fa-bell"></i>
+                    通知設定
+                    <span style="margin-left: auto; background: #ff4757; color: white; border-radius: 10px; padding: 2px 8px; font-size: 12px;">3</span>
+                </a>
+                <a href="#" class="dropdown-item">
+                    <i class="fas fa-chart-bar"></i>
+                    使用統計
+                </a>
+                <div class="dropdown-divider"></div>
+                <a href="#" class="dropdown-item">
+                    <i class="fas fa-question-circle"></i>
+                    幫助中心
+                </a>
+                <a href="#" class="dropdown-item">
+                    <i class="fas fa-life-ring"></i>
+                    意見回饋
+                </a>
+                <div class="dropdown-divider"></div>
+                <a href="#" class="dropdown-item" style="color: #e74c3c;">
+                    <i class="fas fa-sign-out-alt"></i>
+                    登出
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="controls">
+            <input type="text" id="companyInput" class="company-input" placeholder="請輸入公司名稱或業務描述...">
+            <button id="generateBtn" class="btn generate-btn">AI 生成框架</button>
+            <button id="clearBtn" class="btn clear-btn">清除</button>
+        </div>
+
+        <div class="progress-section" id="progressSection">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div id="progressText"></div>
+        </div>
+
+        <h1 class="page-title">XXX成<span class="red-text">長</span>四步框架</h1>
+
+        <table class="description-table">
+            <tbody>
+                <tr>
+                    <td class="description-label">目的/意義</td>
+                    <td class="description-text">請從"面"的緯度進行思考，並結合成員發展規劃的內容，尋求科學且長期的目標</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <table class="framework-table" id="frameworkTable">
+            <thead>
+                <tr>
+                    <th rowspan="3"></th>
+                    <th colspan="5" class="stage-header stage-1">① 分類預測</th>
+                    <th colspan="5" class="stage-header stage-2">② 規範流程SOP</th>
+                    <th colspan="1" class="stage-header stage-3">③ 數據自動化</th>
+                    <th colspan="4" class="stage-header stage-4">④ 反饋渠道</th>
+                </tr>
+                <tr>
+                    <th class="sub-header" rowspan="2">類別<br><span class="red-text">(方向)</span></th>
+                    <th class="sub-header" rowspan="2">體系<br><span class="red-text">(機制)</span></th>
+                    <th class="sub-header" rowspan="2">環節<br><span class="red-text">(系統)</span></th>
+                    <th class="sub-header" rowspan="2">階段<br><span class="red-text">(步驟)</span></th>
+                    <th class="sub-header" rowspan="2">人<br><span class="red-text">(負責人)</span></th>
+                    <th class="sub-header sub-header-2" rowspan="2">人</th>
+                    <th class="sub-header sub-header-2" rowspan="2">時間</th>
+                    <th class="sub-header sub-header-2" rowspan="2">事 (SOP)</th>
+                    <th class="sub-header sub-header-2" colspan="2">空間 (實施系統)</th>
+                    <th class="sub-header sub-header-3" rowspan="2">數據監測報表</th>
+                    <th class="sub-header sub-header-4" rowspan="2">渠道類別</th>
+                    <th class="sub-header sub-header-4" rowspan="2">渠道名稱</th>
+                    <th class="sub-header sub-header-4" rowspan="2">相關成員</th>
+                    <th class="sub-header sub-header-4" rowspan="2">溝通頻率</th>
+                </tr>
+                <tr>
+                    <th class="sub-header sub-header-2">目前系統</th>
+                    <th class="sub-header sub-header-2">優化系統</th>
+                </tr>
+            </thead>
+            <tbody id="dataRows">
+                <!-- JS will generate rows here -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // 用戶菜單功能
+        const userAvatar = document.getElementById('userAvatar');
+        const userDropdown = document.getElementById('userDropdown');
+        
+        if (userAvatar && userDropdown) {
+            // 點擊頭像切換下拉菜單
+            userAvatar.addEventListener('click', function(e) {
+                e.stopPropagation();
+                userDropdown.classList.toggle('show');
+            });
+            
+            // 點擊其他地方關閉下拉菜單
+            document.addEventListener('click', function(e) {
+                if (!userAvatar.contains(e.target) && !userDropdown.contains(e.target)) {
+                    userDropdown.classList.remove('show');
+                }
+            });
+            
+            // 下拉菜單項目點擊事件
+            const dropdownItems = userDropdown.querySelectorAll('.dropdown-item');
+            dropdownItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const text = this.textContent.trim();
+                    
+                    if (text === '登出') {
+                        if (confirm('確定要登出嗎？')) {
+                            alert('登出成功！');
+                            // 這裡可以添加實際的登出邏輯
+                            // window.location.href = 'login.html';
+                        }
+                    } else {
+                        alert(`${text}功能即將開放！`);
+                    }
+                    
+                    userDropdown.classList.remove('show');
+                });
+            });
+        }
+
+        // Elements
+        const companyInput = document.getElementById('companyInput');
+        const generateBtn = document.getElementById('generateBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const progressSection = document.getElementById('progressSection');
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+        const dataRows = document.getElementById('dataRows');
+        const pageTitle = document.querySelector('.page-title');
+
+        // Templates
+        const templates = {
+            "默認": {
+                title: "XXX成<span class='red-text'>長</span>四步框架",
+                rows: 10,
+                data: [
+                    // 第1行 - 完整的15列内容
+                    { row: 0, col: 0, text: "市场定位" }, { row: 0, col: 1, text: "产品体系" }, { row: 0, col: 2, text: "市场调研" }, { row: 0, col: 3, text: "目标用户分析" }, { row: 0, col: 4, text: "产品经理" },
+                    { row: 0, col: 5, text: "调研团队" }, { row: 0, col: 6, text: "2周" }, { row: 0, col: 7, text: "用户访谈及问卷调研" }, { row: 0, col: 8, text: "在线调研平台" }, { row: 0, col: 9, text: "智能问卷系统" },
+                    { row: 0, col: 10, text: "用户画像分析报表" }, { row: 0, col: 11, text: "内部沟通" }, { row: 0, col: 12, text: "团队周会" }, { row: 0, col: 13, text: "产品、市场团队" }, { row: 0, col: 14, text: "每周一次" },
+                    // 第2行 - 完整的15列内容  
+                    { row: 1, col: 0, text: "功能设计" }, { row: 1, col: 1, text: "设计体系" }, { row: 1, col: 2, text: "原型设计" }, { row: 1, col: 3, text: "界面优化" }, { row: 1, col: 4, text: "UI设计师" },
+                    { row: 1, col: 5, text: "设计团队" }, { row: 1, col: 6, text: "1周" }, { row: 1, col: 7, text: "界面设计及交互优化" }, { row: 1, col: 8, text: "设计工具" }, { row: 1, col: 9, text: "协作设计平台" },
+                    { row: 1, col: 10, text: "设计规范执行率" }, { row: 1, col: 11, text: "设计评审" }, { row: 1, col: 12, text: "设计稿评审会" }, { row: 1, col: 13, text: "设计、产品团队" }, { row: 1, col: 14, text: "每次迭代" },
+                    // 第3行 - 完整的15列内容
+                    { row: 2, col: 0, text: "技术开发" }, { row: 2, col: 1, text: "开发体系" }, { row: 2, col: 2, text: "功能开发" }, { row: 2, col: 3, text: "代码实现" }, { row: 2, col: 4, text: "技术负责人" },
+                    { row: 2, col: 5, text: "开发团队" }, { row: 2, col: 6, text: "3周" }, { row: 2, col: 7, text: "功能开发及代码审查" }, { row: 2, col: 8, text: "开发环境" }, { row: 2, col: 9, text: "自动化部署" },
+                    { row: 2, col: 10, text: "代码质量检测报表" }, { row: 2, col: 11, text: "技术评审" }, { row: 2, col: 12, text: "代码评审会" }, { row: 2, col: 13, text: "技术、测试团队" }, { row: 2, col: 14, text: "每日站会" },
+                    // 第4行 - 完整业务流程
+                    { row: 3, col: 0, text: "竞争分析" }, { row: 3, col: 1, text: "市场部" }, { row: 3, col: 2, text: "分析主要竞品" }, { row: 3, col: 3, text: "明确差异化优势" }, { row: 3, col: 4, text: "市场分析师" },
+                    { row: 3, col: 5, text: "运营团队" }, { row: 3, col: 6, text: "2周" }, { row: 3, col: 7, text: "制定内容营销策略" }, { row: 3, col: 8, text: "CRM系统" }, { row: 3, col: 9, text: "集成营销工具" },
+                    { row: 3, col: 10, text: "用户生命周期报表" }, { row: 3, col: 11, text: "用户流失预警" }, { row: 3, col: 12, text: "关键功能使用率低" }, { row: 3, col: 13, text: "产品、客服" }, { row: 3, col: 14, text: "每两周" },
+                    // 第5行
+                    { row: 4, col: 0, text: "产品功能" }, { row: 4, col: 1, text: "技术团队" }, { row: 4, col: 2, text: "核心功能开发" }, { row: 4, col: 3, text: "MVP版本发布" }, { row: 4, col: 4, text: "技术负责人" },
+                    { row: 4, col: 5, text: "测试团队" }, { row: 4, col: 6, text: "1周" }, { row: 4, col: 7, text: "功能测试及bug修复" }, { row: 4, col: 8, text: "测试环境" }, { row: 4, col: 9, text: "自动化测试" },
+                    { row: 4, col: 10, text: "功能使用率统计" }, { row: 4, col: 11, text: "系统性能异常" }, { row: 4, col: 12, text: "响应时间过长" }, { row: 4, col: 13, text: "技术、运维" }, { row: 4, col: 14, text: "实时监控" },
+                    // 第6行
+                    { row: 5, col: 0, text: "用户体验" }, { row: 5, col: 1, text: "设计团队" }, { row: 5, col: 2, text: "用户界面优化" }, { row: 5, col: 3, text: "提升用户满意度" }, { row: 5, col: 4, text: "UI/UX设计师" },
+                    { row: 5, col: 5, text: "客服团队" }, { row: 5, col: 6, text: "持续" }, { row: 5, col: 7, text: "用户反馈收集处理" }, { row: 5, col: 8, text: "客服系统" }, { row: 5, col: 9, text: "智能客服机器人" },
+                    { row: 5, col: 10, text: "用户满意度调查" }, { row: 5, col: 11, text: "客服响应异常" }, { row: 5, col: 12, text: "用户投诉增加" }, { row: 5, col: 13, text: "客服、产品" }, { row: 5, col: 14, text: "每日" }
+                ]
+            },
+            "電商": {
+                title: "XXX成<span class='red-text'>長</span>四步框架",
+                rows: 12,
+                data: [
+                    // 第1行
+                    { row: 0, col: 0, text: "供应链管理" }, { row: 0, col: 1, text: "采购体系" }, { row: 0, col: 2, text: "供应商评估" }, { row: 0, col: 3, text: "建立合作关系" }, { row: 0, col: 4, text: "采购经理" },
+                    { row: 0, col: 5, text: "采购团队" }, { row: 0, col: 6, text: "2周" }, { row: 0, col: 7, text: "供应商考察及合同签署" }, { row: 0, col: 8, text: "ERP系统" }, { row: 0, col: 9, text: "供应商管理系统" },
+                    { row: 0, col: 10, text: "采购成本分析报表" }, { row: 0, col: 11, text: "供应商质量异常" }, { row: 0, col: 12, text: "货物质量不达标" }, { row: 0, col: 13, text: "采购、质检" }, { row: 0, col: 14, text: "每批次检验" },
+                    // 第2行
+                    { row: 1, col: 0, text: "库存管理" }, { row: 1, col: 1, text: "仓储系统" }, { row: 1, col: 2, text: "库存优化" }, { row: 1, col: 3, text: "降低库存成本" }, { row: 1, col: 4, text: "仓库经理" },
+                    { row: 1, col: 5, text: "仓储人员" }, { row: 1, col: 6, text: "每日" }, { row: 1, col: 7, text: "入库出库及盘点作业" }, { row: 1, col: 8, text: "WMS系统" }, { row: 1, col: 9, text: "智能仓储设备" },
+                    { row: 1, col: 10, text: "库存周转率报表" }, { row: 1, col: 11, text: "库存积压预警" }, { row: 1, col: 12, text: "滞销商品过多" }, { row: 1, col: 13, text: "仓储、采购" }, { row: 1, col: 14, text: "每周分析" },
+                    // 第3行
+                    { row: 2, col: 0, text: "订单处理" }, { row: 2, col: 1, text: "订单系统" }, { row: 2, col: 2, text: "订单流程优化" }, { row: 2, col: 3, text: "提高处理效率" }, { row: 2, col: 4, text: "订单专员" },
+                    { row: 2, col: 5, text: "客服团队" }, { row: 2, col: 6, text: "实时" }, { row: 2, col: 7, text: "订单确认及状态更新" }, { row: 2, col: 8, text: "订单管理系统" }, { row: 2, col: 9, text: "自动化订单处理" },
+                    { row: 2, col: 10, text: "订单处理时效报表" }, { row: 2, col: 11, text: "订单处理延迟" }, { row: 2, col: 12, text: "超过承诺时间" }, { row: 2, col: 13, text: "客服、物流" }, { row: 2, col: 14, text: "每小时监控" },
+                    // 第4行
+                    { row: 3, col: 0, text: "物流配送" }, { row: 3, col: 1, text: "配送网络" }, { row: 3, col: 2, text: "配送路线优化" }, { row: 3, col: 3, text: "提升配送效率" }, { row: 3, col: 4, text: "物流经理" },
+                    { row: 3, col: 5, text: "配送员" }, { row: 3, col: 6, text: "每日" }, { row: 3, col: 7, text: "货物分拣打包配送" }, { row: 3, col: 8, text: "TMS系统" }, { row: 3, col: 9, text: "智能路径规划" },
+                    { row: 3, col: 10, text: "配送时效统计" }, { row: 3, col: 11, text: "配送延误预警" }, { row: 3, col: 12, text: "未按时送达" }, { row: 3, col: 13, text: "物流、客服" }, { row: 3, col: 14, text: "实时跟踪" },
+                    // 第5行
+                    { row: 4, col: 0, text: "客户服务" }, { row: 4, col: 1, text: "服务体系" }, { row: 4, col: 2, text: "售后服务流程" }, { row: 4, col: 3, text: "提升客户满意度" }, { row: 4, col: 4, text: "客服主管" },
+                    { row: 4, col: 5, text: "客服代表" }, { row: 4, col: 6, text: "7x24" }, { row: 4, col: 7, text: "客户咨询及投诉处理" }, { row: 4, col: 8, text: "客服系统" }, { row: 4, col: 9, text: "智能客服机器人" },
+                    { row: 4, col: 10, text: "客服满意度评分" }, { row: 4, col: 11, text: "客服质量异常" }, { row: 4, col: 12, text: "响应时间过长" }, { row: 4, col: 13, text: "客服、管理" }, { row: 4, col: 14, text: "每日质检" }
+                ]
+            },
+            "SaaS": {
+                title: "XXX成<span class='red-text'>長</span>四步框架",
+                rows: 11,
+                data: [
+                    // 第1行
+                    { row: 0, col: 0, text: "产品定位" }, { row: 0, col: 1, text: "产品体系" }, { row: 0, col: 2, text: "市场需求分析" }, { row: 0, col: 3, text: "确定产品方向" }, { row: 0, col: 4, text: "产品经理" },
+                    { row: 0, col: 5, text: "研发团队" }, { row: 0, col: 6, text: "4周" }, { row: 0, col: 7, text: "产品原型设计开发" }, { row: 0, col: 8, text: "开发环境" }, { row: 0, col: 9, text: "云端开发平台" },
+                    { row: 0, col: 10, text: "产品功能使用统计" }, { row: 0, col: 11, text: "功能使用异常" }, { row: 0, col: 12, text: "关键功能利用率低" }, { row: 0, col: 13, text: "产品、运营" }, { row: 0, col: 14, text: "每周分析" },
+                    // 第2行
+                    { row: 1, col: 0, text: "客户获取" }, { row: 1, col: 1, text: "营销体系" }, { row: 1, col: 2, text: "线上推广策略" }, { row: 1, col: 3, text: "获取目标客户" }, { row: 1, col: 4, text: "营销经理" },
+                    { row: 1, col: 5, text: "营销团队" }, { row: 1, col: 6, text: "持续" }, { row: 1, col: 7, text: "内容营销及广告投放" }, { row: 1, col: 8, text: "营销自动化" }, { row: 1, col: 9, text: "智能投放系统" },
+                    { row: 1, col: 10, text: "获客成本及转化率" }, { row: 1, col: 11, text: "获客成本异常" }, { row: 1, col: 12, text: "CAC持续上升" }, { row: 1, col: 13, text: "营销、财务" }, { row: 1, col: 14, text: "每月复盘" },
+                    // 第3行
+                    { row: 2, col: 0, text: "客户成功" }, { row: 2, col: 1, text: "成功管理" }, { row: 2, col: 2, text: "客户生命周期" }, { row: 2, col: 3, text: "提升客户价值" }, { row: 2, col: 4, text: "CSM经理" },
+                    { row: 2, col: 5, text: "客户成功团队" }, { row: 2, col: 6, text: "持续" }, { row: 2, col: 7, text: "客户培训及价值实现" }, { row: 2, col: 8, text: "CRM系统" }, { row: 2, col: 9, text: "客户健康度模型" },
+                    { row: 2, col: 10, text: "客户健康度评分" }, { row: 2, col: 11, text: "客户流失预警" }, { row: 2, col: 12, text: "使用频率下降" }, { row: 2, col: 13, text: "CSM、产品" }, { row: 2, col: 14, text: "每周检查" },
+                    // 第4行
+                    { row: 3, col: 0, text: "产品迭代" }, { row: 3, col: 1, text: "研发体系" }, { row: 3, col: 2, text: "敏捷开发流程" }, { row: 3, col: 3, text: "快速响应需求" }, { row: 3, col: 4, text: "技术负责人" },
+                    { row: 3, col: 5, text: "研发工程师" }, { row: 3, col: 6, text: "2周" }, { row: 3, col: 7, text: "功能开发测试发布" }, { row: 3, col: 8, text: "DevOps平台" }, { row: 3, col: 9, text: "自动化部署" },
+                    { row: 3, col: 10, text: "开发效率及质量" }, { row: 3, col: 11, text: "开发进度延迟" }, { row: 3, col: 12, text: "里程碑延期" }, { row: 3, col: 13, text: "研发、产品" }, { row: 3, col: 14, text: "每周同步" },
+                    // 第5行
+                    { row: 4, col: 0, text: "数据分析" }, { row: 4, col: 1, text: "数据体系" }, { row: 4, col: 2, text: "用户行为分析" }, { row: 4, col: 3, text: "优化产品体验" }, { row: 4, col: 4, text: "数据分析师" },
+                    { row: 4, col: 5, text: "数据团队" }, { row: 4, col: 6, text: "每日" }, { row: 4, col: 7, text: "数据收集清洗分析" }, { row: 4, col: 8, text: "数据仓库" }, { row: 4, col: 9, text: "实时数据平台" },
+                    { row: 4, col: 10, text: "用户行为漏斗分析" }, { row: 4, col: 11, text: "数据质量异常" }, { row: 4, col: 12, text: "数据缺失或错误" }, { row: 4, col: 13, text: "数据、技术" }, { row: 4, col: 14, text: "每日监控" }
+                ]
+            }
+        };
+
+        // Functions
+        function typewriter(element, text, callback) {
+            let i = 0;
+            element.innerHTML = "";
+            element.classList.add('typing-animation');
+            const typing = () => {
+                if (i < text.length) {
+                    element.innerHTML += text.charAt(i);
+                    i++;
+                    setTimeout(typing, 30);
+                } else {
+                    element.classList.remove('typing-animation');
+                    if (callback) callback();
+                }
+            };
+            typing();
+        }
+
+        function generateFramework() {
+            const companyName = companyInput.value.trim();
+            let templateKey = "默認";
+            if (companyName.includes("電商") || companyName.toLowerCase().includes("e-commerce")) {
+                templateKey = "電商";
+            } else if (companyName.includes("SaaS") || companyName.toLowerCase().includes("software")) {
+                templateKey = "SaaS";
+            }
+            
+            const template = templates[templateKey];
+            const finalTitle = companyName ? `${companyName}成<span class='red-text'>長</span>四步框架` : template.title;
+            pageTitle.innerHTML = finalTitle;
+            
+            initTable(template.rows);
+
+            progressSection.style.display = 'block';
+            progressFill.style.width = '0%';
+            progressText.textContent = 'AI 分析中...';
+
+            let filledCount = 0;
+            const totalToFill = template.data.length;
+
+            function fillCell(index) {
+                if (index >= totalToFill) {
+                    progressText.textContent = '生成完成！';
+                    setTimeout(() => { progressSection.style.display = 'none'; }, 2000);
+                    return;
+                }
+
+                const item = template.data[index];
+                const cell = dataRows.rows[item.row]?.cells[item.col + 1]; // +1 to skip vertical header
+                
+                if (cell) {
+                    typewriter(cell, item.text, () => {
+                        filledCount++;
+                        const percentage = Math.round((filledCount / totalToFill) * 100);
+                        progressFill.style.width = percentage + '%';
+                        progressText.textContent = `正在生成: ${item.text} (${percentage}%)`;
+                        fillCell(index + 1);
+                    });
+                } else {
+                    // Skip if cell doesn't exist
+                    fillCell(index + 1);
+                }
+            }
+
+            fillCell(0);
+        }
+
+        function clearFramework() {
+            companyInput.value = '';
+            pageTitle.innerHTML = `XXX成<span class="red-text">長</span>四步框架`;
+            progressSection.style.display = 'none';
+            initTable();
+        }
+
+        function initTable(rows = 10) {
+            dataRows.innerHTML = '';
+            for (let i = 0; i < rows; i++) {
+                const row = dataRows.insertRow();
+                const headerCell = row.insertCell();
+                headerCell.className = 'row-header-vertical';
+                headerCell.textContent = i + 1;
+                
+                // There are 15 columns in total based on the corrected header structure
+                for (let j = 0; j < 15; j++) {
+                    const cell = row.insertCell();
+                    cell.className = 'data-cell';
+                }
+            }
+        }
+
+        // Event Listeners
+        generateBtn.addEventListener('click', generateFramework);
+        clearBtn.addEventListener('click', clearFramework);
+
+        // Real-time title update
+        companyInput.addEventListener('input', function() {
+            const companyName = this.value.trim();
+            if (companyName) {
+                pageTitle.innerHTML = `${companyName}成<span class="red-text">長</span>四步框架`;
+            } else {
+                pageTitle.innerHTML = `XXX成<span class="red-text">長</span>四步框架`;
+            }
+        });
+
+        // Initial Load
+        document.addEventListener('DOMContentLoaded', () => initTable());
+
+    </script>
+</body>
+</html>
