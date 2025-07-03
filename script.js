@@ -91,6 +91,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 window.location.href = 'sandbox-training.html';
             } else if (name === '成長賦能') {
                 window.location.href = 'growth-empowerment.html';
+            } else if (name === '成長四步框架') {
+                window.location.href = 'growth-framework-clean.html';
             } else {
                 alert('該功能正在開發中，敬請期待！');
             }
